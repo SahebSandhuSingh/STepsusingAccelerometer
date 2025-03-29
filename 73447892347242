@@ -1,0 +1,28 @@
+% Load Data (If not already loaded)
+load steps.mat
+% Extract X, Y, and Z columns
+ax = Acceleration.X; 
+ay = Acceleration.Y;
+az = Acceleration.Z;
+% Compute Acceleration Magnitude
+acc_magnitude = sqrt(ax.^2 + ay.^2 + az.^2);
+fs=10;
+% Add the computed magnitude to the timetable
+Acceleration.Magnitude = acc_magnitude;
+plot(Acceleration.Timestamp,Acceleration.Magnitude)
+designal=detrend(acc_magnitude);
+plot(Acceleration.Timestamp,designal);
+[pxx,fxx]=pwelch(designal,fs)
+plot(fxx,pxx)
+fs = 10;        % Sampling frequency (adjust if needed)
+fc = 2;         % Cutoff frequency (Hz)
+N = 4;          % Filter order
+Rp = 0.5;       % Passband ripple (dB)
+% Design Chebyshev Type I Low-Pass Filter
+[b, a] = cheby1(N, Rp, fc/(fs/2), 'low');  % Normalize cutoff frequency
+filtered_data = filtfilt(b, a, acc_magnitude);  % Zero-phase filtering
+figure;
+plot(Acceleration.Timestamp,Acceleration.Magnitude,Acceleration.Timestamp,filtered_data)
+[peaks,locs]=findpeaks(filteredsignal)
+xy=length(locs);
+disp(xy)
